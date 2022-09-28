@@ -1,24 +1,56 @@
-import logo from './logo.svg';
+import {useState,useEffect} from 'react';
+
+import DependentSelect from 'components/select/DependentSelect';
+
+import TW_ADDRESS_DATA from 'data/TWAddressData';
+
 import './App.css';
 
 function App() {
+  const [selectData,setSelectData]=useState({
+    selectCity: "",
+    selectDistrict: ""
+  });
+  const {selectCity,selectDistrict}=selectData;
+  const [areaList,setAreaList]=useState([]);
+  const [tmpCity,setTmpCity]=useState("");
+
+  useEffect(()=>{
+    if(selectCity!==tmpCity){
+      setSelectData({
+        ...selectData,
+        selectDistrict: ""
+      });
+    }
+
+    if(selectCity===""){
+      setSelectData({
+        selectCity: "",
+        selectDistrict: ""
+      });
+      setAreaList([]);
+    }
+    else{
+      setAreaList(TW_ADDRESS_DATA.find(city=>city.cityName===selectCity).areaList);
+    }
+  },[selectCity]);
+
+  const changeHandler=(e)=>{
+    setTmpCity(selectCity);
+
+		setSelectData({
+			...selectData,
+      [e.target.name]: e.target.value
+    });
+  };
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className="section-padding bg-height">
+      <div className="container container-padding">
+        <DependentSelect selectData={selectData} areaList={areaList} changeHandler={changeHandler} />
+        <div className="text">{selectCity}{selectDistrict}</div>
+      </div>
+    </section>
   );
 }
 
